@@ -11,6 +11,7 @@ import cv2
 img1 = cv2.imread('images/IMG_0758_small.JPG')
 img2 = cv2.imread('images/IMG_0761_small.JPG')
 
+img_final = img1.copy()
 
 img1gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
 img2gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -146,6 +147,11 @@ cv2.imwrite('img_diff_gray_rect.png', img_diff_gray)
 # - store reference to image with the lowest number of SIFT features in the bounding rectangle
 rects_dict_best = {}
 
+img1_kp = img1.copy()
+img2_kp = img2.copy()
+
+image_list_kp = [img1_kp, img2_kp]
+
 for i1,image in enumerate([img1gray, img2gray]):
     for i2, rect in enumerate(rects_list_nms):
         x1,y1,x2,y2 = rect
@@ -156,11 +162,19 @@ for i1,image in enumerate([img1gray, img2gray]):
         kp_count = len(kp)
         print 'num keypoints: ', len(kp)
 
+        s_img = image_list_kp[i1][y1: y2, x1: x2]
+        s_img = cv2.drawKeypoints(s_img,kp,None,(255,0,0),4)
+
+        image_list_kp[i1][y1:y1+s_img.shape[0], x1:x1+s_img.shape[1]] = s_img
+
         if rect in rects_dict_best:
             if kp_count < rects_dict_best[rect][0]:
                 rects_dict_best[rect] = (kp_count, i1)
         else:
             rects_dict_best[rect] = (kp_count, i1)
+
+cv2.imwrite('img1_kp.png', image_list_kp[0])
+cv2.imwrite('img2_kp.png', image_list_kp[1])
 
 # print rects_dict_best
 
@@ -170,10 +184,8 @@ for rect in rects_dict_best:
     if rects_dict_best[rect][1] != 0:
         x1, y1, x2, y2 = rect
         s_img = image_list[rects_dict_best[rect][1]][y1: y2, x1: x2]
-        x_offset=x1
-        y_offset=y1
-        img1[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
+        img_final[y1:y1+s_img.shape[0], x1:x1+s_img.shape[1]] = s_img
 
-cv2.imwrite('final.png', img1)
+cv2.imwrite('final.png', img_final)
 
 
