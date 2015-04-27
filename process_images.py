@@ -142,18 +142,15 @@ cv2.imwrite('img_diff_gray_rect.png', img_diff_gray)
 
 
 # - extract bounding rectangle area from each image
-# - find contours within the extracted area
-# - store reference to image with the lowest number of contours in the bounding rectangle
+# - find number of features (SIFT) within the extracted area
+# - store reference to image with the lowest number of SIFT features in the bounding rectangle
 rects_dict_best = {}
 
 for i1,image in enumerate([img1gray, img2gray]):
     for i2, rect in enumerate(rects_list_nms):
         x1,y1,x2,y2 = rect
         crop_img = image[y1: y2, x1: x2]
-        ret, thresh = cv2.threshold(crop_img, 127, 255,0)
-        contours,hierarchy = cv2.findContours(thresh,3,1)
         print 'rect: ', rect
-        print 'num of contours: ', len(contours)
         sift = cv2.SIFT()
         kp = sift.detect(crop_img,None)
         kp_count = len(kp)
