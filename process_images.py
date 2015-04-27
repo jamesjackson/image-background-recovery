@@ -164,7 +164,7 @@ for i1,image in enumerate([img1gray, img2gray]):
 
 # print rects_dict_best
 
-# replace bounding rectangle areas with those having the lowest number of contours
+# replace bounding rectangle areas with those having the lowest number of SIFT features
 image_list = [img1, img2]
 for rect in rects_dict_best:
     if rects_dict_best[rect][1] != 0:
